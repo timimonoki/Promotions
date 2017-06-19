@@ -7,8 +7,8 @@ import promotions.tools.web.BrowserManager;
 
 public class KauflandArea extends BasePageObject {
 
-    @FindBy(css = "")
-    private WebElement w;
+    @FindBy(xpath = "/html/body/div[2]/main/div/div[1]/div/div/div[2]/div/a/div[2]/div[1]/figure/img")
+    private WebElement currentCatalog;
 
     public KauflandArea(BrowserManager browserManager){
         super(browserManager);
