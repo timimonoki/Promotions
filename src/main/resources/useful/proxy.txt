@@ -1,0 +1,5 @@
+browserManager.getProxy().newHar("lidl.ro");
+          browserManager.openUrl("http://www.lidl.ro/ro/2829.htm");
+       Har har = browserManager.getProxy().getHar();
+        ObjectMapper mapper = new ObjectMapper();
+        String harString = mapper.writeValueAsString(har);

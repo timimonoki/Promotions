@@ -20,8 +20,7 @@ public abstract class BasePageObject {
 
     LidlArea lidlArea;
 
-    @Autowired
-    BasePageObject(BrowserManager browserManager){
+    public BasePageObject(BrowserManager browserManager){
         this.driver = browserManager.getDriver();
         this.wait = browserManager.getWait();
     }

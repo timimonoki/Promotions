@@ -1,69 +1,70 @@
 package promotions.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import net.lightbody.bmp.core.har.Har;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import promotions.exceptions.CurrentCatalogException;
+import promotions.model.Image;
 import promotions.pageArea.LidlArea;
 import promotions.service.LidlService;
-import promotions.tools.web.FirefoxManager;
+import promotions.tools.web.BrowserManager;
 
-import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/promotions")
 public class LidlController{
 
-    private static Logger logger = LogManager.getLogger();
+    private static final Logger logger = Logger.getLogger(LidlController.class);
 
-    FirefoxManager firefoxManager;
+    BrowserManager browserManager;
 
     LidlArea lidlArea;
 
     @Autowired
     LidlService lidlService;
 
-    public void initPages(WebDriver driver, WebDriverWait wait){
-        lidlArea = new LidlArea();
+    @Autowired
+    Environment env;
+
+    public void initPages(WebDriver driver, WebDriverWait wait) throws MalformedURLException {
+        lidlArea = new LidlArea(browserManager);
 
         PageFactory.initElements(driver, lidlArea);
         logger.info("Initializing lidlArea...");
     }
 
-    @RequestMapping(value = "/lidl")
-    public void getHarFileForLIdl() throws InterruptedException, IOException {
-        firefoxManager = new FirefoxManager();
+    @RequestMapping(value = "/lidl", method = RequestMethod.GET)
+    public void getCurrentCatalogImages() throws Exception {
+        browserManager = new BrowserManager(env);
 
-        initPages(firefoxManager.getDriver(), firefoxManager.getWait());
+        initPages(browserManager.getDriver(), browserManager.getWait());
+        browserManager.openUrl(env.getProperty("catalog.url.lidl"));
 
-        firefoxManager.getProxy().newHar("lidl.ro");
-        firefoxManager.openUrl("http://www.lidl.ro/ro/2829.htm");
-        Har har = firefoxManager.getProxy().getHar();
-        ObjectMapper mapper = new ObjectMapper();
-        String harString = mapper.writeValueAsString(har);
-
-        System.out.println(harString);
-
-        //I should need a wait for element present here, not sure yet how to extend BasePageObject
-        lidlArea.getCatalogues().get(0).click();
-
-        //waitForPageLoad --here
-        // ---then do
-        String currentUrl = firefoxManager.getDriver().getCurrentUrl();
-        lidlService.getCatalogueImagesForCurrentPromotion(currentUrl);
-
-        firefoxManager.closeBrowser();
-        firefoxManager.close();
+        Thread.sleep(2000);
+        lidlArea.waitForElementToBeClickable(lidlArea.getCatalogs().get(0));
+        lidlArea.getCatalogs().get(0).click();
+        String currentUrl = browserManager.getDriver().getCurrentUrl();
+        try {
+            lidlService.getAllImagesForCurrentCatalog(currentUrl);
+        }catch (CurrentCatalogException e){
+            browserManager.closeBrowser();
+            browserManager.close();
+        }
+        browserManager.closeBrowser();
+        browserManager.close();
     }
 
-    @RequestMapping(value = "/try")
-    public void incearca() throws IOException {
-        lidlService.getCatalogueImagesForCurrentPromotion("http://catalog.lidl.ro/acd07657-a63e-4c86-ae3c-fcf1bfb19620/html5.html#/1");
+    @RequestMapping(value = "/all", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<Image> findAllImagesForCurrentCatalog(){
+       return lidlService.findAllImagesForCurrentCatalog();
     }
 }

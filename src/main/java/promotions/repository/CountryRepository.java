@@ -2,8 +2,8 @@ package promotions.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import promotions.model.Promotii;
+import promotions.model.Country;
 
 @Repository
-public interface Promotions_Repository extends JpaRepository<Promotii, Integer> {
+public interface CountryRepository extends JpaRepository<Country, Integer> {
 }
