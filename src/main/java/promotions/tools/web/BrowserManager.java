@@ -9,6 +9,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.CapabilityType;
@@ -16,7 +17,6 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 
 import java.net.MalformedURLException;
@@ -64,15 +64,24 @@ public class BrowserManager {
                 proxy = new BrowserMobProxyServer();
                 proxy.start(15);
                 Proxy seleniumProxy = ClientUtil.createSeleniumProxy(proxy);
+                FirefoxProfile profile = new FirefoxProfile();
+                profile.setAcceptUntrustedCertificates(true);
                 DesiredCapabilities capabilities = new DesiredCapabilities();
                 capabilities.setCapability(CapabilityType.PROXY, seleniumProxy);
-
+                capabilities.setCapability(FirefoxDriver.PROFILE, profile);
+                capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
+                String path = "C:/Users/MonokiT/Desktop/Betfair Internship/Promotii/Promotions/src/main/resources/drivers/geckodriver.exe";
+                System.setProperty("webdriver.gecko.driver", path);
                 driver = new FirefoxDriver(capabilities);
                 logger.info("Initiating FirefoxManager instance...");
             }
         }
         wait = new WebDriverWait(this.driver, 90);
 
+    }
+
+    public BrowserMobProxy getProxy() {
+        return proxy;
     }
 
     public WebDriverWait getWait() {
