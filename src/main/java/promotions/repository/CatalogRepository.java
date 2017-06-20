@@ -12,6 +12,9 @@ import java.util.List;
 @Repository
 public interface CatalogRepository extends CrudRepository<Catalog, Integer> {
 
-    @Query("SELECT c FROM Catalog c WHERE c.end_date > Date(:current_date) AND c.shop.name = :shop_name")
+    @Query("SELECT c FROM Catalog c WHERE c.end_date > :current_date AND c.shop.name = :shop_name")
     List<Catalog> findByAvailability(@Param("current_date") Date currentDate, @Param("shop_name") String shopName);
+
+    @Query("SELECT c FROM Catalog c JOIN c.shop s JOIN s.shopDetails d WHERE d.city = :city")
+    Catalog findCurrentCatalogForACity(@Param("city") String city);
 }

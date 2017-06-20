@@ -28,7 +28,7 @@ public class Catalog {
     private Shop shop;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "catalog")
+    @OneToMany(mappedBy = "catalog", fetch = FetchType.LAZY)
     private List<Image> images;
 
     public Catalog(){}
