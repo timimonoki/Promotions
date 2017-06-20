@@ -76,8 +76,13 @@ public class LidlService {
         }
     }
 
-    public List<Image> findAllImagesForCurrentCatalog(){
-        return imageRepository.findAllImagesForCurrentCatalog();
+    public List<Catalog> findAllCatalogsWithImages(){
+        return imageRepository.findAllCatalogsWithImages();
+    }
+
+    public Catalog findCurrentCatalogForACity(String city){
+        Catalog catalog = catalogRepository.findCurrentCatalogForACity(city);
+        return catalog;
     }
 
     public List<String> getAvailability(String catalogImagesUrl) throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
