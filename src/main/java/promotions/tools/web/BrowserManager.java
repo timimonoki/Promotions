@@ -18,6 +18,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import promotions.utils.conf.SiteConfigurations;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -38,9 +39,9 @@ public class BrowserManager {
     private DesiredCapabilities capabilities;
     private BrowserMobProxy proxy;
 
-    @Autowired
-    public BrowserManager(Environment env) throws MalformedURLException {
-        this.browserType = env.getProperty("browser.type.name");
+
+    public BrowserManager(SiteConfigurations conf) throws MalformedURLException {
+        this.browserType = conf.getBrowserType();
         switch (this.browserType){
             case "chrome" : {
                 DesiredCapabilities cap = DesiredCapabilities.chrome();

@@ -49,7 +49,7 @@ public abstract class BasePageObject {
 
     public void waitForElementPresent(WebDriver driver, final WebElement elementToWait) {
         Wait<WebDriver> wait = new FluentWait<>(driver)
-                .withTimeout(30, TimeUnit.SECONDS)
+                .withTimeout(50, TimeUnit.SECONDS)
                 .pollingEvery(2, TimeUnit.SECONDS)
                 .ignoring(NoSuchElementException.class);
         wait.until(new Function<WebDriver, Boolean>() {

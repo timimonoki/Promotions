@@ -34,7 +34,7 @@ public class LidlJob extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
 //        try {
-//            lidlController.getCurrentCatalogImages();
+//            lidlController.obtainCurrentCatalogImages();
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }

@@ -21,16 +21,24 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.*;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.util.*;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import promotions.repository.ShopRepository;
+import promotions.utils.conf.SiteConfigurations;
+
 import static promotions.utils.Utils.getDateFromString;
 
 @Service
-public class LidlService {
+public class LidlService extends BaseService{
+
+    private static final Logger logger = Logger.getLogger(LidlService.class);
+
+    @Autowired
+    SiteConfigurations configurations;
 
     @Autowired
     ImageRepository imageRepository;
@@ -44,9 +52,15 @@ public class LidlService {
     @Autowired
     CountryRepository countryRepository;
 
-    private static final Logger logger = Logger.getLogger(LidlService.class);
+    public void obtainCurrentCatalogImages() throws Exception {
+        setUp(configurations);
+        browserManager.openUrl(configurations.getLidlUrl());
+        lidlArea.waitForElementPresent(browserManager.getDriver(), lidlArea.getCatalogs().get(0));
+        lidlArea.getCatalogs().get(0).click();
+        getAllImagesForCurrentCatalog(browserManager.getDriver().getCurrentUrl());
+    }
 
-    public void getAllImagesForCurrentCatalog(String catalogUrl) throws ParserConfigurationException, IOException, SAXException, XPathExpressionException, ParseException {
+    public void getAllImagesForCurrentCatalog(String catalogUrl) throws Exception {
         String[] formatURL = catalogUrl.split("/html5");
         String catalogImagesUrl = formatURL[0].concat("/mobile.xml");
 

@@ -32,37 +32,12 @@ public class LidlController{
 
     private static final Logger logger = Logger.getLogger(LidlController.class);
 
-    BrowserManager browserManager;
-
-    LidlArea lidlArea;
-
     @Autowired
     LidlService lidlService;
 
-    @Autowired
-    Environment env;
-
-    @Autowired
-    JdbcTemplate jdbcTemplate;
-
-    public void initPages(WebDriver driver, WebDriverWait wait) throws MalformedURLException {
-        lidlArea = new LidlArea(browserManager);
-
-        PageFactory.initElements(driver, lidlArea);
-        logger.info("Initializing lidlArea...");
-    }
-
     @RequestMapping(value = "/lidl", method = RequestMethod.GET)
-    public void getCurrentCatalogImages() throws Exception {
-        browserManager = new BrowserManager(env);
-
-        initPages(browserManager.getDriver(), browserManager.getWait());
-        browserManager.openUrl(env.getProperty("catalog.url.lidl"));
-
-        Thread.sleep(2000);
-        lidlArea.waitForElementToBeClickable(lidlArea.getCatalogs().get(0));
-        lidlArea.getCatalogs().get(0).click();
-        String currentUrl = browserManager.getDriver().getCurrentUrl();
+    public void obtainCurrentCatalogImages() throws Exception {
+        lidlService.obtainCurrentCatalogImages();
         try {
             lidlService.getAllImagesForCurrentCatalog(currentUrl);
         }catch (CurrentCatalogException e){
