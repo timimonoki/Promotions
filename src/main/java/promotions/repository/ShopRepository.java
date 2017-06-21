@@ -13,4 +13,6 @@ public interface ShopRepository extends JpaRepository<Shop, Integer> {
 
     @Query("SELECT s FROM Shop s JOIN s.countries c WHERE s.name = :shop_name AND c.name = :country")
     Shop findByShopnameAndCountry(@Param("shop_name") String shopName, @Param("country") String country);
+
+    Shop findByName(@Param("shop_name") String shopName);
 }

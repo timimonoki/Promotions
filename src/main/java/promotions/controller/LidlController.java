@@ -27,7 +27,7 @@ import java.net.MalformedURLException;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/promotions")
+@RequestMapping(value = "/lidl")
 public class LidlController{
 
     private static final Logger logger = Logger.getLogger(LidlController.class);
@@ -35,7 +35,7 @@ public class LidlController{
     @Autowired
     LidlService lidlService;
 
-    @RequestMapping(value = "/lidl", method = RequestMethod.GET)
+    @RequestMapping(value = "/promotions", method = RequestMethod.GET)
     public void obtainCurrentCatalogImages() throws Exception {
         lidlService.obtainCurrentCatalogImages();
         try {
@@ -48,7 +48,7 @@ public class LidlController{
         browserManager.close();
     }
 
-    @RequestMapping(value = "/all", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/allCatalogs", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Catalog> findAllCatalogs(){
        return lidlService.findAllCatalogsWithImages();
     }
@@ -56,5 +56,20 @@ public class LidlController{
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public Catalog findCurrentCatalogForACity(@RequestParam String city){
         return lidlService.findCurrentCatalogForACity(city);
+    }
+
+    @RequestMapping(value = "/allShops", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<String> getAllShopNames(){
+        return lidlService.getAllShopNames();
+    }
+
+    @RequestMapping(value = "/allShops", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<String> getAllShopsInACountry(@RequestParam String country){
+        return lidlService.getAllShopsInACountry(country);
+    }
+
+    @RequestMapping(value = "/details", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<ShopDetails> getAllShopDetailsForAShop(@RequestParam String shopName){
+        return lidlService.getAllShopDetailsForAShop(shopName);
     }
 }
