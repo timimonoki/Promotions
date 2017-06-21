@@ -19,7 +19,7 @@ import promotions.tools.web.BrowserManager;
 import java.net.MalformedURLException;
 
 @RestController
-@RequestMapping(value = "/promotions")
+@RequestMapping(value = "/kaufland")
 public class KauflandController {
 
     private static final Logger logger = Logger.getLogger(KauflandController.class);
@@ -38,7 +38,7 @@ public class KauflandController {
         logger.info("Initializing kauflandArea...");
     }
 
-    @RequestMapping(value = "/kaufland", method = RequestMethod.GET)
+    @RequestMapping(value = "/promotions", method = RequestMethod.GET)
     public void getCurrentCatalogImages() throws MalformedURLException, JsonProcessingException {
         browserManager = new BrowserManager(env);
         initPages(browserManager.getDriver(), browserManager.getWait());

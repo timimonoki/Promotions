@@ -13,9 +13,12 @@ import promotions.exceptions.ExceptionResponse;
 import promotions.model.Catalog;
 import promotions.model.Image;
 import promotions.model.Shop;
+import promotions.model.ShopDetails;
 import promotions.repository.CatalogRepository;
 import promotions.repository.CountryRepository;
 import promotions.repository.ImageRepository;
+
+import javax.swing.plaf.SliderUI;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -24,6 +27,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 import java.util.Date;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import promotions.repository.ShopRepository;
@@ -132,5 +136,29 @@ public class LidlService {
             }
         }
         return imageUrls;
+    }
+
+    public List<String> getAllShopNames(){
+        List<Shop> shops = shopRepository.findAll();
+        List<String> shopNames = new ArrayList<>();
+        shops.forEach(shop->shopNames.add(shop.getName()));
+        return shopNames;
+    }
+
+    public List<String> getAllShopsInACountry(String country){
+        List<Shop> shops = shopRepository.findAll();
+        List<String> shopCountries = new ArrayList<>();
+
+        shops.forEach(shop -> shop.getCountries().forEach(shopCountry -> shopCountries.add(shopCountry.getName())));
+        return null;
+    }
+
+    public List<ShopDetails> getAllShopDetailsForAShop(String shopName){
+        Shop shop = shopRepository.findByName(shopName);
+        return null;
+    }
+
+    public Integer updateShopLocation(){
+        return null;
     }
 }
