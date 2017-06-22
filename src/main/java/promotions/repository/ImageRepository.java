@@ -11,10 +11,10 @@ import java.util.List;
 @Repository
 public interface ImageRepository extends JpaRepository<Image, Integer>{
 
-    @Query("SELECT i FROM Image i JOIN i.catalog c JOIN c.shop s WHERE s.name = 'Lidl' AND c.end_date < CURRENT_DATE ")
+    @Query("SELECT i FROM Image i JOIN i.catalog.shop WHERE i.catalog.shop.name = 'Lidl' AND i.catalog.end_date < CURRENT_DATE ")
     List<Image>findAllImagesForCurrentCatalog();
 
-    @Query("SELECT c FROM Catalog JOIN c.images JOIN c.shop s WHERE s.name = 'Lidl' AND c.end_date < CURRENT_DATE ")
+    @Query("SELECT c FROM Catalog c WHERE c.shop.name = 'Lidl' AND c.end_date < CURRENT_DATE ")
     List<Catalog> findAllCatalogsWithImages();
 
 }

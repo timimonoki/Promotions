@@ -1,5 +1,7 @@
 package promotions.model;
 
+import net.minidev.json.annotate.JsonIgnore;
+
 import javax.persistence.*;
 import java.sql.Time;
 
@@ -32,6 +34,7 @@ public class ShopDetails {
     @Column(name = "closing_hour")
     private Time closingHour;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "shop_id")
     private Shop shop;

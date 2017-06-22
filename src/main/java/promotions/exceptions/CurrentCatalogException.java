@@ -1,9 +1,9 @@
 package promotions.exceptions;
 
-public class CurrentCatalogException extends WebServiceException {
+public class CurrentCatalogException extends Exception {
 
-    public CurrentCatalogException(ExceptionResponse exceptionResponse){
-        super(exceptionResponse);
+    public CurrentCatalogException(String msg){
+        super(msg);
     }
 
 }

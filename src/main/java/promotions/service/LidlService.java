@@ -8,41 +8,27 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import promotions.exceptions.CurrentCatalogException;
-import promotions.exceptions.ExceptionCode;
-import promotions.exceptions.ExceptionResponse;
 import promotions.model.Catalog;
-import promotions.model.Image;
 import promotions.model.Shop;
 import promotions.model.ShopDetails;
 import promotions.repository.CatalogRepository;
 import promotions.repository.CountryRepository;
 import promotions.repository.ImageRepository;
-
-import javax.swing.plaf.SliderUI;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.*;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.text.ParseException;
 import java.util.*;
 import java.util.Date;
-import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import promotions.repository.ShopRepository;
-import promotions.utils.conf.SiteConfigurations;
-
-import static promotions.utils.Utils.getDateFromString;
 
 @Service
 public class LidlService extends BaseService{
 
     private static final Logger logger = Logger.getLogger(LidlService.class);
-
-    @Autowired
-    SiteConfigurations configurations;
 
     @Autowired
     ImageRepository imageRepository;
@@ -61,7 +47,14 @@ public class LidlService extends BaseService{
         browserManager.openUrl(configurations.getLidlUrl());
         lidlArea.waitForElementPresent(browserManager.getDriver(), lidlArea.getCatalogs().get(0));
         lidlArea.getCatalogs().get(0).click();
-        getAllImagesForCurrentCatalog(browserManager.getDriver().getCurrentUrl());
+        try {
+            getAllImagesForCurrentCatalog(browserManager.getDriver().getCurrentUrl());
+        }catch (Exception e){}
+        finally {
+            browserManager.getProxy().stop();
+            browserManager.closeBrowser();
+            browserManager.close();
+        }
     }
 
     public void getAllImagesForCurrentCatalog(String catalogUrl) throws Exception {
@@ -76,31 +69,14 @@ public class LidlService extends BaseService{
         if(currentCatalog.isEmpty()){
             Shop shop = shopRepository.findByShopnameAndCountry("Lidl", "Romania");
             if(shop == null){
-                throw new CurrentCatalogException(new ExceptionResponse(ExceptionCode.UNEXISTING_SHOP, "This shop does not exist in Romania!"));
+                logger.warn("This shop does not exist in Romania!");
+                throw new CurrentCatalogException("This shop does not exist in Romania!");
             }
-            Catalog catalog = new Catalog();
-            catalog.setName(catalogName);
-            catalog.setStart_date(getDateFromString(availability.get(0)));
-            catalog.setEnd_date(getDateFromString(availability.get(1)));
-            catalog.setShop(shop);
-            catalogRepository.save(catalog);
-            for(String imageUrl : imageUrls){
-                Image image = new Image(imageUrl);
-                image.setCatalog(catalog);
-                imageRepository.save(image);
-            }
+            saveCatalog(shop, catalogName, availability, imageUrls);
         }else {
             logger.warn("This catalog already exists. You were trying to save the current catalogue twice. Nothing will be done");
+            throw new CurrentCatalogException("This catalog already exists");
         }
-    }
-
-    public List<Catalog> findAllCatalogsWithImages(){
-        return imageRepository.findAllCatalogsWithImages();
-    }
-
-    public Catalog findCurrentCatalogForACity(String city){
-        Catalog catalog = catalogRepository.findCurrentCatalogForACity(city);
-        return catalog;
     }
 
     public List<String> getAvailability(String catalogImagesUrl) throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
@@ -152,14 +128,23 @@ public class LidlService extends BaseService{
         return imageUrls;
     }
 
-    public List<String> getAllShopNames(){
+    public List<Catalog> findAllCatalogsWithImages(){
+        return imageRepository.findAllCatalogsWithImages();
+    }
+
+    public Catalog findCurrentCatalogsForACity(String city){
+        Catalog catalog = catalogRepository.findCurrentCatalogForACity(city);
+        return catalog;
+    }
+
+    public List<Shop> getAllShops(){
         List<Shop> shops = shopRepository.findAll();
         List<String> shopNames = new ArrayList<>();
         shops.forEach(shop->shopNames.add(shop.getName()));
-        return shopNames;
+        return shops;
     }
 
-    public List<String> getAllShopsInACountry(String country){
+    public List<Shop> getAllShopsInACountry(String country){
         List<Shop> shops = shopRepository.findAll();
         List<String> shopCountries = new ArrayList<>();
 
