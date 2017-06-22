@@ -12,9 +12,8 @@ import promotions.model.Catalog;
 import promotions.model.Country;
 import promotions.model.Shop;
 import promotions.model.ShopDetails;
-import promotions.repository.CatalogRepository;
-import promotions.repository.CountryRepository;
-import promotions.repository.ImageRepository;
+import promotions.repository.*;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -26,8 +25,6 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import promotions.repository.ShopRepository;
 
 @Service
 public class LidlService extends BaseService{
@@ -45,6 +42,9 @@ public class LidlService extends BaseService{
 
     @Autowired
     CountryRepository countryRepository;
+
+    @Autowired
+    ShopDetailsRepository shopDetailsRepository;
 
     public void obtainCurrentCatalogImages() throws Exception {
         setUp(configurations);
@@ -148,19 +148,33 @@ public class LidlService extends BaseService{
         return shops;
     }
 
-    public List<Shop> getAllShopsInACountry(String country){
+    public List<Shop> getAllShopsInACountry(String country) throws Exception {
         List<Shop> shops = shopRepository.findAll();
+        if(shops == null){
+            throw new Exception("At the moment there are no shops in the database");
+        }
         return shops
                 .stream()
                 .filter(s -> s.getCountries().stream().anyMatch(c -> c.getName().equals(country)))
                 .collect(Collectors.toList());
     }
 
-    public List<ShopDetails> getAllShopDetailsForAShop(String shopName){
+    public List<ShopDetails> getAllShopDetailsForAShop(String shopName) throws Exception {
         Shop shop = shopRepository.findByName(shopName);
+        if(shop == null){
+            logger.warn("The shop you were looking for does not exist");
+            throw new Exception("This shop does not exist");
+        }
         List<ShopDetails> shopDetails = new ArrayList<>();
         shop.getShopDetails().forEach(sd -> shopDetails.add(sd));
         return shopDetails;
+    }
+
+    public List<Shop> findShops(String countryName, String cityName) throws Exception {
+        //you can use a method which receives varargs paramaters and validate those parameters
+        List<Shop> shops = shopRepository.findAll();
+
+        return null;
     }
 
     public Integer updateShopLocation(){

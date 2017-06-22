@@ -44,6 +44,7 @@ public class ShopDetails {
 
     public ShopDetails(){}
 
+    @JsonIgnore
     public Integer getId() {
         return id;
     }

@@ -12,7 +12,11 @@ import promotions.model.Shop;
 import promotions.model.ShopDetails;
 import promotions.service.LidlService;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/lidl")
@@ -44,12 +48,19 @@ public class LidlController{
     }
 
     @RequestMapping(value = "/allShopsIn", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Shop> getAllShopsInACountry(@RequestParam String country){
+    public List<Shop> getAllShopsInACountry(@RequestParam String country) throws Exception {
         return lidlService.getAllShopsInACountry(country);
     }
 
     @RequestMapping(value = "/details", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<ShopDetails> getAllShopDetailsForAShop(@RequestParam String shopName){
+    public List<ShopDetails> getAllShopDetailsForAShop(@RequestParam String shopName) throws Exception {
         return lidlService.getAllShopDetailsForAShop(shopName);
+    }
+
+    @RequestMapping(value = "/find", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<Shop> findShops(@RequestParam(required = false, defaultValue = "") String countryName,
+                                @RequestParam(required = false, defaultValue = "") String cityName) throws Exception {
+
+        return lidlService.findShops(countryName, cityName);
     }
 }

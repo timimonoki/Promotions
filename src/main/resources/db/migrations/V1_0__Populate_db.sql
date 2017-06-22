@@ -100,9 +100,8 @@ CREATE TABLE `promotions`.`shop_details` (
   `state` VARCHAR(45) NOT NULL,
   `city` VARCHAR(45) NOT NULL,
   `zipcode` VARCHAR(45) NOT NULL,
-  `opening_hour` TIME(4) NULL,
-  `closing_hour` TIME(4) NULL,
-  `shop_detailscol` VARCHAR(45) NULL,
+  `opening_hour` TIME(0) NULL,
+  `closing_hour` TIME(0) NULL,
   `shop_id` INT NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
@@ -128,4 +127,6 @@ INSERT INTO `promotions`.`category` (id, name)  VALUES
 
 INSERT INTO `promotions`.`shops` (id, name, identification_nb) VALUES (1, "Lidl", '10223685');
 INSERT INTO `promotions`.`shops_countries` (shop_id, country_id) VALUES (1, 1);
+INSERT INTO `promotions`.`shop_details` (id, street, street_number, state, city, zipcode, opening_hour, closing_hour, shop_id) VALUES (1, 'Str. Apalinei', '1', 'Mures', 'Reghin', '545300', '7:30', '21:00', 1);
+
 
