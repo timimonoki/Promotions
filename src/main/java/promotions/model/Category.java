@@ -1,5 +1,6 @@
 package promotions.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import net.minidev.json.annotate.JsonIgnore;
 
 import javax.persistence.*;
@@ -16,11 +17,11 @@ public class Category {
     @Column(name = "name")
     private String name;
 
-    @JsonIgnore
     @ManyToMany
     @JoinTable(name = "shops_categories",
             joinColumns = {@JoinColumn(name = "category_id")},
             inverseJoinColumns = {@JoinColumn(name = "shop_id")})
+    @JsonManagedReference
     private List<Shop> shops;
 
     public Category(){}

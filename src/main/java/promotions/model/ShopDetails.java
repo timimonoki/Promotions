@@ -1,6 +1,7 @@
 package promotions.model;
 
-import net.minidev.json.annotate.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.sql.Time;
@@ -16,7 +17,7 @@ public class ShopDetails {
     @Column(name = "street", nullable = false)
     private String street;
 
-    @Column(name = "street_nb", nullable = false)
+    @Column(name = "street_number", nullable = false)
     private String streetNumber;
 
     @Column(name = "state")
@@ -37,6 +38,7 @@ public class ShopDetails {
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "shop_id")
+    @JsonBackReference
     private Shop shop;
 
 

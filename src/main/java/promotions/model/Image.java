@@ -1,5 +1,8 @@
 package promotions.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 @Entity
@@ -18,6 +21,7 @@ public class Image {
 
     @JoinColumn(name = "catalogue_id")
     @ManyToOne(fetch = FetchType.EAGER)
+    @JsonBackReference
     private Catalog catalog;
 
     public Image(){}

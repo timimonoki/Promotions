@@ -9,6 +9,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import promotions.exceptions.CurrentCatalogException;
 import promotions.model.Catalog;
+import promotions.model.Country;
 import promotions.model.Shop;
 import promotions.model.ShopDetails;
 import promotions.repository.CatalogRepository;
@@ -21,8 +22,11 @@ import javax.xml.xpath.*;
 import java.io.IOException;
 import java.util.*;
 import java.util.Date;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 import promotions.repository.ShopRepository;
 
 @Service
@@ -146,15 +150,17 @@ public class LidlService extends BaseService{
 
     public List<Shop> getAllShopsInACountry(String country){
         List<Shop> shops = shopRepository.findAll();
-        List<String> shopCountries = new ArrayList<>();
-
-        shops.forEach(shop -> shop.getCountries().forEach(shopCountry -> shopCountries.add(shopCountry.getName())));
-        return null;
+        return shops
+                .stream()
+                .filter(s -> s.getCountries().stream().anyMatch(c -> c.getName().equals(country)))
+                .collect(Collectors.toList());
     }
 
     public List<ShopDetails> getAllShopDetailsForAShop(String shopName){
         Shop shop = shopRepository.findByName(shopName);
-        return null;
+        List<ShopDetails> shopDetails = new ArrayList<>();
+        shop.getShopDetails().forEach(sd -> shopDetails.add(sd));
+        return shopDetails;
     }
 
     public Integer updateShopLocation(){

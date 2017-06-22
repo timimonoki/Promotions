@@ -1,5 +1,6 @@
 package promotions.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import net.minidev.json.annotate.JsonIgnore;
 
 import javax.persistence.*;
@@ -27,8 +28,8 @@ public class Catalog {
     @ManyToOne(fetch = FetchType.EAGER)
     private Shop shop;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "catalog", fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Image> images;
 
     public Catalog(){}

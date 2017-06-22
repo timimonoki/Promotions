@@ -1,6 +1,9 @@
 package promotions.model;
 
-import net.minidev.json.annotate.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 
 import javax.persistence.*;
 import java.sql.Time;
@@ -20,25 +23,25 @@ public class Shop {
     @Column(name = "identification_nb", nullable = false)
     private Long idNumber;
 
-    @JsonIgnore
     @ManyToMany
     @JoinTable(name = "shops_countries",
             joinColumns = {@JoinColumn(name = "shop_id")},
             inverseJoinColumns = {@JoinColumn(name = "country_id")})
+    @JsonBackReference
     private List<Country> countries;
 
     @JsonIgnore
     @OneToMany(mappedBy = "shop")
+    @JsonManagedReference
     private List<ShopDetails> shopDetails;
 
-    @JsonIgnore
     @ManyToMany
     @JoinTable(name = "shops_categories",
             joinColumns = {@JoinColumn(name = "shop_id")},
             inverseJoinColumns = {@JoinColumn(name = "category_id")})
+    @JsonBackReference
     private List<Category> categories;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "shop")
     private List<Catalog> catalogs;
 
