@@ -8,12 +8,14 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import promotions.exceptions.CurrentCatalogException;
+import promotions.exceptions.EntityNotFoundException;
+import promotions.exceptions.ValidatorException;
 import promotions.model.Catalog;
-import promotions.model.Country;
+import promotions.model.Image;
 import promotions.model.Shop;
 import promotions.model.ShopDetails;
 import promotions.repository.*;
-
+import promotions.utils.validation.InputValidator;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -21,10 +23,11 @@ import javax.xml.xpath.*;
 import java.io.IOException;
 import java.util.*;
 import java.util.Date;
-import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static promotions.utils.Constants.*;
 
 @Service
 public class LidlService extends BaseService{
@@ -45,6 +48,9 @@ public class LidlService extends BaseService{
 
     @Autowired
     ShopDetailsRepository shopDetailsRepository;
+
+    @Autowired
+    InputValidator validator;
 
     public void obtainCurrentCatalogImages() throws Exception {
         setUp(configurations);
@@ -71,12 +77,7 @@ public class LidlService extends BaseService{
 
         List<Catalog> currentCatalog = catalogRepository.findByAvailability(new Date(), "Lidl");
         if(currentCatalog.isEmpty()){
-            Shop shop = shopRepository.findByShopnameAndCountry("Lidl", "Romania");
-            if(shop == null){
-                logger.warn("This shop does not exist in Romania!");
-                throw new CurrentCatalogException("This shop does not exist in Romania!");
-            }
-            saveCatalog(shop, catalogName, availability, imageUrls);
+            saveCatalog("Romania", "Lidl", catalogName, availability, imageUrls);
         }else {
             logger.warn("This catalog already exists. You were trying to save the current catalogue twice. Nothing will be done");
             throw new CurrentCatalogException("This catalog already exists");
@@ -132,49 +133,30 @@ public class LidlService extends BaseService{
         return imageUrls;
     }
 
-    public List<Catalog> findAllCatalogsWithImages(){
-        return imageRepository.findAllCatalogsWithImages();
+    public List<Catalog> findAllCatalogsForLidl(){
+        return catalogRepository.findAllCatalogsForAShop(LIDL);
     }
 
-    public Catalog findCurrentCatalogsForACity(String city){
-        Catalog catalog = catalogRepository.findCurrentCatalogForACity(city);
-        return catalog;
-    }
-
-    public List<Shop> getAllShops(){
-        List<Shop> shops = shopRepository.findAll();
-        List<String> shopNames = new ArrayList<>();
-        shops.forEach(shop->shopNames.add(shop.getName()));
-        return shops;
-    }
-
-    public List<Shop> getAllShopsInACountry(String country) throws Exception {
-        List<Shop> shops = shopRepository.findAll();
-        if(shops == null){
-            throw new Exception("At the moment there are no shops in the database");
+    public List<Catalog> findCurrentCatalogsForLidl(String city) throws ValidatorException, EntityNotFoundException {
+        validator.validate(city);
+        if(!"".equals(city)){
+            if(shopDetailsRepository.findByCityName(city) == null){
+                throw new EntityNotFoundException("This city does not exist in our database. Please insert something else");
+            }
+            return catalogRepository.findCurrentCatalogsForAShop(LIDL).stream()
+                    .filter(catalog -> catalog.getShop().getShopDetails().stream().anyMatch(sd -> sd.getCity().equals(city)))
+                    .collect(Collectors.toList());
+        }else{
+            return catalogRepository.findCurrentCatalogsForAShop(LIDL);
         }
-        return shops
-                .stream()
-                .filter(s -> s.getCountries().stream().anyMatch(c -> c.getName().equals(country)))
-                .collect(Collectors.toList());
     }
 
-    public List<ShopDetails> getAllShopDetailsForAShop(String shopName) throws Exception {
-        Shop shop = shopRepository.findByName(shopName);
-        if(shop == null){
-            logger.warn("The shop you were looking for does not exist");
-            throw new Exception("This shop does not exist");
+    public List<Image> findImagesForACatalog(Integer id) throws EntityNotFoundException {
+        Catalog catalog = catalogRepository.findOne(id);
+        if(catalog == null){
+            throw new EntityNotFoundException("This catalog does not exist");
         }
-        List<ShopDetails> shopDetails = new ArrayList<>();
-        shop.getShopDetails().forEach(sd -> shopDetails.add(sd));
-        return shopDetails;
-    }
-
-    public List<Shop> findShops(String countryName, String cityName) throws Exception {
-        //you can use a method which receives varargs paramaters and validate those parameters
-        List<Shop> shops = shopRepository.findAll();
-
-        return null;
+        return catalog.getImages();
     }
 
     public Integer updateShopLocation(){

@@ -1,5 +1,6 @@
 package promotions.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import net.minidev.json.annotate.JsonIgnore;
 
@@ -8,7 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "catalogue")
+@Table(name = "catalog")
 public class Catalog {
 
     @Id
@@ -28,6 +29,7 @@ public class Catalog {
     @ManyToOne(fetch = FetchType.EAGER)
     private Shop shop;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "catalog", fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<Image> images;
@@ -50,6 +52,7 @@ public class Catalog {
         this.name = name;
     }
 
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="dd-MM-yyyy")
     public Date getStart_date() {
         return start_date;
     }
@@ -58,6 +61,7 @@ public class Catalog {
         this.start_date = start_date;
     }
 
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="dd-MM-yyyy")
     public Date getEnd_date() {
         return end_date;
     }

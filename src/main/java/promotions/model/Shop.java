@@ -21,7 +21,7 @@ public class Shop {
     private String name;
 
     @Column(name = "identification_nb", nullable = false)
-    private Long idNumber;
+    private String idNumber;
 
     @ManyToMany
     @JoinTable(name = "shops_countries",
@@ -65,11 +65,11 @@ public class Shop {
         this.name = name;
     }
 
-    public Long getIdNumber() {
+    public String getIdNumber() {
         return idNumber;
     }
 
-    public void setIdNumber(Long idNumber) {
+    public void setIdNumber(String idNumber) {
         this.idNumber = idNumber;
     }
 

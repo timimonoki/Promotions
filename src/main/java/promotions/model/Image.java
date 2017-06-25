@@ -19,7 +19,8 @@ public class Image {
     @Column(name = "type")
     private String type;
 
-    @JoinColumn(name = "catalogue_id")
+    @JsonIgnore
+    @JoinColumn(name = "catalog_id")
     @ManyToOne(fetch = FetchType.EAGER)
     @JsonBackReference
     private Catalog catalog;
