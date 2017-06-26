@@ -7,13 +7,11 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.ImportResource;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import promotions.exceptions.EntityNotFoundException;
 import promotions.exceptions.ValidatorException;
-import promotions.model.Catalog;
-import promotions.model.Image;
-import promotions.model.Shop;
-import promotions.model.ShopDetails;
+import promotions.model.*;
 import promotions.pageArea.KauflandArea;
 import promotions.pageArea.LidlArea;
 import promotions.repository.*;
@@ -154,6 +152,7 @@ public abstract class BaseService {
             predicateList.add(catalog -> catalog.getEnd_date().equals(endDate));
         }
         List<Catalog> catalogs = catalogRepository.findAll();
+        Predicate predicate = QCatalog.catalog.end_date.equals(endDate);
 
         if(predicateList.isEmpty()){
             return catalogs;

@@ -49,7 +49,6 @@ public class BaseController {
     @RequestMapping(value = "/findShops", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Shop> findShops(@RequestParam(required = false, defaultValue = "") String country,
                                 @RequestParam(required = false, defaultValue = "") String city) throws Exception {
-
         return baseService.findShops(country, city);
     }
 
