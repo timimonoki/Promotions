@@ -17,4 +17,8 @@ public class Utils {
         Date date = formatter.parse(dateInString);
         return date;
     }
+
+    public static String getStringFromDate(Date date){
+        return new SimpleDateFormat("dd-MM-yyyy").format(date);
+    }
 }

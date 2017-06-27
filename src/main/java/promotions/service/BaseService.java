@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import promotions.exceptions.EntityNotFoundException;
 import promotions.exceptions.ValidatorException;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 
 import static promotions.utils.Constants.LIDL;
 import static promotions.utils.Utils.getDateFromString;
+import static promotions.utils.Utils.getStringFromDate;
 
 @Component
 @ImportResource(locations = {"classpath:beans.xml"})
@@ -92,35 +94,35 @@ public abstract class BaseService {
         });
     }
 
-    public List<Shop> findShops(String country, String city) throws Exception {
+    public List<Shop> findShops(String country, String city, String searchKey, Sort.Direction direction, String orderBy, Integer page, Integer pageSize) throws Exception {
         validator.validate(country, city);
-        List<Predicate<Shop>> predicateList = new ArrayList<>();
         if(!"".equals(country)){
             if(countryRepository.findByName(country).isEmpty()){
                 throw new EntityNotFoundException("The coutry you entered does not exist in out database. Please enter something else");
             }
-            predicateList.add(shop -> shop.getCountries().stream().anyMatch(c -> c.getName().equals(country)));
         }
         if(!"".equals(city)){
             if(shopDetailsRepository.findByCityName(city).isEmpty()){
                 throw new EntityNotFoundException("The city you have entered does not exist in out database. Please enter something else");
             }
-            predicateList.add(shop -> shop.getShopDetails().stream().anyMatch(sd -> sd.getCity().equals(city)));
         }
-        List<Shop> shops = shopRepository.findAll();
+        QShop qShop = QShop.shop;
+        com.querydsl.core.types.Predicate predicate = qShop.countries.any().name.eq(country)
+                                        .and(qShop.shopDetails.any().city.eq(city))
+                                        .or(qShop.name.containsIgnoreCase(searchKey))
+                                        .or(qShop.countries.any().name.containsIgnoreCase(searchKey))
+                                        .or(qShop.shopDetails.any().city.containsIgnoreCase(searchKey))
+                                        .or(qShop.countries.any().countryCode.containsIgnoreCase(searchKey))
+                                        .or(qShop.shopDetails.any().street.containsIgnoreCase(searchKey));
 
-        if(predicateList.isEmpty()){
-            return  shops;
-        }else{
-            return shops.stream()
-                    .filter(predicateList.stream().reduce(Predicate::and).orElse(null))
-                    .collect(Collectors.toList());
-        }
+        List<Shop> shops = shopRepository.findAll(predicate, new PageRequest(page, pageSize, new Sort(direction, orderBy))).getContent();
+        return shops;
     }
 
-    public List<Catalog> findCatalogs(String country, String city, String shop, Integer id, Date startDate, Date endDate) throws ValidatorException, EntityNotFoundException {
-        validator.validate(country, city, shop);
+    public List<Catalog> findCatalogs(String country, String city, String shop, Integer id, Date startDate, Date endDate, String searchKey, String orderBy, Sort.Direction direction, Integer page, Integer pageSize) throws ValidatorException, EntityNotFoundException {
+        validator.validate(country, city, shop, searchKey);
         List<Predicate<Catalog>> predicateList = new ArrayList<>();
+        List<Predicate<Catalog>> searchKeyPredicateList = new ArrayList<>();
         if(!"".equals(country)){
             if(countryRepository.findByName(country).isEmpty()){
                 throw new EntityNotFoundException("This country does not exist in our database. Please enter something else");
@@ -146,21 +148,32 @@ public abstract class BaseService {
             predicateList.add(catalog -> catalog.getId().equals(id));
         }
         if(startDate != null){
-            predicateList.add(catalog -> catalog.getStart_date().equals(startDate));
+            predicateList.add(catalog -> catalog.getStart_date().after(startDate));
         }
         if(endDate != null){
-            predicateList.add(catalog -> catalog.getEnd_date().equals(endDate));
+            predicateList.add(catalog -> catalog.getEnd_date().before(endDate));
         }
-        List<Catalog> catalogs = catalogRepository.findAll();
-        Predicate predicate = QCatalog.catalog.end_date.equals(endDate);
+        searchKeyPredicateList.add(catalog -> catalog.getName().contains(searchKey));
+        searchKeyPredicateList.add(catalog -> getStringFromDate(catalog.getStart_date()).contains(searchKey));
+        searchKeyPredicateList.add(catalog -> getStringFromDate(catalog.getEnd_date()).contains(searchKey));
+        searchKeyPredicateList.add(catalog -> catalog.getShop().getName().contains(searchKey));
+
+        List<Catalog> catalogs = catalogRepository.findAll(new PageRequest(page, pageSize, new Sort(direction, orderBy))).getContent();
 
         if(predicateList.isEmpty()){
-            return catalogs;
+            return catalogs.stream()
+                    .filter(searchKeyPredicateList.stream().reduce(Predicate::or).orElse(null))
+                    .collect(Collectors.toList());
         }else {
             return catalogs.stream()
                     .filter(predicateList.stream().reduce(Predicate::and).orElse(null))
+                    .filter(searchKeyPredicateList.stream().reduce(Predicate::or).orElse(null))
                     .collect(Collectors.toList());
         }
+    }
+
+    public Catalog findCatalogById(Integer id){
+        return catalogRepository.findOne(id);
     }
 
     public List<Catalog> findCurrentCatalogsForACity(String city) throws ValidatorException, EntityNotFoundException {
@@ -193,7 +206,7 @@ public abstract class BaseService {
         return shop.getShopDetails();
     }
 
-    public List<ShopDetails> getShopDetailsForAShop(String shopName, String country, String city) throws ValidatorException, EntityNotFoundException {
+    public List<ShopDetails> getShopDetailsForAShop(String shopName, String country, String city, Sort.Direction direction, String orderBy, Integer page, Integer pageSize) throws ValidatorException, EntityNotFoundException {
         validator.validate(shopName, country, city);
         Shop shop = shopRepository.findByName(shopName);
         if(shop == null){

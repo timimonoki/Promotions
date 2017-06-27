@@ -23,7 +23,7 @@ public interface CatalogRepository extends JpaRepository<Catalog, Integer>, Quer
     @Query("SELECT c FROM Catalog c JOIN c.shop s WHERE s.name = :shop AND c.end_date > CURRENT_DATE")
     List<Catalog> findCurrentCatalogsForAShop(@Param("shop") String shop);
 
-    @Query("SELECT c FROM Catalog c c.end_date > CURRENT_DATE")
+    @Query("SELECT c FROM Catalog c WHERE c.end_date > CURRENT_DATE")
     List<Catalog> findCurrentCatalogs();
 
     @Query("SELECT c FROM Catalog c JOIN c.shop s WHERE s.name = :shop")
