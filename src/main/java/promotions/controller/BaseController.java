@@ -77,6 +77,7 @@ public class BaseController {
     public List<ShopDetails> getShopDetailsForAShop(@RequestParam String shop,
                                                     @RequestParam(required = false, defaultValue = "") String country,
                                                     @RequestParam(required = false, defaultValue = "") String city,
+                                                    @RequestParam(required = false, defaultValue = "") String searchKey,
                                                     @RequestParam(required = false, defaultValue = "city") String orderBy,
                                                     @RequestParam(required = false, defaultValue = "ASC") Sort.Direction orderDirection,
                                                     @RequestParam(required = false, defaultValue = "0") Integer page,

@@ -127,49 +127,33 @@ public abstract class BaseService {
             if(countryRepository.findByName(country).isEmpty()){
                 throw new EntityNotFoundException("This country does not exist in our database. Please enter something else");
             }
-            predicateList.add(catalog -> catalog.getShop().getCountries().stream().anyMatch(c -> c.getName().equals(country)));
         }
         if(!"".equals(city)){
             if(shopDetailsRepository.findByCityName(city).isEmpty()){
                 throw new EntityNotFoundException("This city does not exist in out database. Please enter something else");
             }
-            predicateList.add(catalog -> catalog.getShop().getShopDetails().stream().anyMatch(sd -> sd.getCity().equals(city)));
         }
         if(!"".equals(shop)){
             if(shopRepository.findByName(shop) == null){
                 throw new EntityNotFoundException("This shop does not exist in our database. Please try something else");
             }
-            predicateList.add(catalog -> catalog.getShop().equals(shop));
         }
-        if(id != null){
-            if(catalogRepository.findOne(id) == null){
+        if(id != null) {
+            if (catalogRepository.findOne(id) == null) {
                 throw new EntityNotFoundException("The catalog with the specified id does not exist in our database");
             }
-            predicateList.add(catalog -> catalog.getId().equals(id));
         }
-        if(startDate != null){
-            predicateList.add(catalog -> catalog.getStart_date().after(startDate));
-        }
-        if(endDate != null){
-            predicateList.add(catalog -> catalog.getEnd_date().before(endDate));
-        }
-        searchKeyPredicateList.add(catalog -> catalog.getName().contains(searchKey));
-        searchKeyPredicateList.add(catalog -> getStringFromDate(catalog.getStart_date()).contains(searchKey));
-        searchKeyPredicateList.add(catalog -> getStringFromDate(catalog.getEnd_date()).contains(searchKey));
-        searchKeyPredicateList.add(catalog -> catalog.getShop().getName().contains(searchKey));
 
-        List<Catalog> catalogs = catalogRepository.findAll(new PageRequest(page, pageSize, new Sort(direction, orderBy))).getContent();
+        QCatalog qCatalog = QCatalog.catalog;
+        com.querydsl.core.types.Predicate predicate = qCatalog.shop.countries.any().name.eq(country)
+                                            .and(qCatalog.shop.name.eq(shop))
+                                            .and(qCatalog.id.eq(id))
+                                            .and(qCatalog.start_date.after(startDate))
+                                            .and(qCatalog.end_date.before(endDate))
+                                            .or(qCatalog.name.containsIgnoreCase(searchKey))
+                                            .or(qCatalog.shop.name.containsIgnoreCase(searchKey));
 
-        if(predicateList.isEmpty()){
-            return catalogs.stream()
-                    .filter(searchKeyPredicateList.stream().reduce(Predicate::or).orElse(null))
-                    .collect(Collectors.toList());
-        }else {
-            return catalogs.stream()
-                    .filter(predicateList.stream().reduce(Predicate::and).orElse(null))
-                    .filter(searchKeyPredicateList.stream().reduce(Predicate::or).orElse(null))
-                    .collect(Collectors.toList());
-        }
+        return catalogRepository.findAll(predicate, new PageRequest(page, pageSize, new Sort(direction, orderBy))).getContent();
     }
 
     public Catalog findCatalogById(Integer id){

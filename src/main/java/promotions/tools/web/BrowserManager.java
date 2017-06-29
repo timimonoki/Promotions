@@ -1,5 +1,6 @@
 package promotions.tools.web;
 
+import org.browsermob.proxy.ProxyServer;
 import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.BrowserMobProxyServer;
 import net.lightbody.bmp.client.ClientUtil;
@@ -14,10 +15,7 @@ import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import promotions.utils.conf.SiteConfigurations;
 
 import java.net.MalformedURLException;
@@ -62,19 +60,23 @@ public class BrowserManager {
                 logger.info("Initiating ChromeDriver instance...");
             }
             case "firefox" : {
-                proxy = new BrowserMobProxyServer();
-                proxy.start(15);
-                Proxy seleniumProxy = ClientUtil.createSeleniumProxy(proxy);
-                FirefoxProfile profile = new FirefoxProfile();
-                profile.setAcceptUntrustedCertificates(true);
-                DesiredCapabilities capabilities = new DesiredCapabilities();
-                capabilities.setCapability(CapabilityType.PROXY, seleniumProxy);
-                capabilities.setCapability(FirefoxDriver.PROFILE, profile);
-                capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
-                String path = "C:/Users/MonokiT/Desktop/Betfair Internship/Promotii/Promotions/src/main/resources/drivers/geckodriver.exe";
-                System.setProperty("webdriver.gecko.driver", path);
-                driver = new FirefoxDriver(capabilities);
-                logger.info("Initiating FirefoxManager instance...");
+                ProxyServer server = new ProxyServer(4446);
+                server.start();
+
+
+//                proxy = new BrowserMobProxyServer();
+//                proxy.start(8081);
+//                Proxy seleniumProxy = ClientUtil.createSeleniumProxy(proxy);
+//                FirefoxProfile profile = new FirefoxProfile();
+//                profile.setAcceptUntrustedCertificates(true);
+//                DesiredCapabilities capabilities = new DesiredCapabilities();
+//                capabilities.setCapability(CapabilityType.PROXY, seleniumProxy);
+//                capabilities.setCapability(FirefoxDriver.PROFILE, profile);
+//                capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
+//                String path = "C:/Users/MonokiT/Desktop/Betfair Internship/Promotii/Promotions/src/main/resources/drivers/geckodriver.exe";
+//                System.setProperty("webdriver.gecko.driver", path);
+//                driver = new FirefoxDriver(capabilities);
+//                logger.info("Initiating FirefoxManager instance...");
             }
         }
         wait = new WebDriverWait(this.driver, 90);
