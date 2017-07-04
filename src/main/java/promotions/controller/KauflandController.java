@@ -43,7 +43,7 @@ public class KauflandController extends BaseController{
     }
 
     @RequestMapping(value = "/promotions", method = RequestMethod.GET)
-    public void getCurrentCatalogImages() throws MalformedURLException, JsonProcessingException {
+    public void getCurrentCatalogImages() throws Exception {
         browserManager = new BrowserManager(configurations);
         initPages(browserManager.getDriver(), browserManager.getWait());
 

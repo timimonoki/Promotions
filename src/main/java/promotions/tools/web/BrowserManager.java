@@ -38,7 +38,7 @@ public class BrowserManager {
     private BrowserMobProxy proxy;
 
 
-    public BrowserManager(SiteConfigurations conf) throws MalformedURLException {
+    public BrowserManager(SiteConfigurations conf) throws Exception {
         this.browserType = conf.getBrowserType();
         switch (this.browserType){
             case "chrome" : {
