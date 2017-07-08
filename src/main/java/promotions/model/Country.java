@@ -21,13 +21,6 @@ public class Country {
     @Column(name = "country_code")
     private String countryCode;
 
-    @ManyToMany
-    @JoinTable(name = "shops_countries",
-            joinColumns = {@JoinColumn(name = "country_id")},
-            inverseJoinColumns = {@JoinColumn(name = "shop_id")})
-    @JsonManagedReference
-    private List<Shop> shops;
-
     public Country(){}
 
 
@@ -55,11 +48,4 @@ public class Country {
         this.countryCode = countryCode;
     }
 
-    public List<Shop> getShops() {
-        return shops;
-    }
-
-    public void setShops(List<Shop> shops) {
-        this.shops = shops;
-    }
 }

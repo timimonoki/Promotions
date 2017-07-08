@@ -1,5 +1,6 @@
 package promotions.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import net.minidev.json.annotate.JsonIgnore;
@@ -79,6 +80,7 @@ public class Catalog {
         this.shop = shop;
     }
 
+    @JsonIgnore
     public List<Image> getImages() {
         return images;
     }

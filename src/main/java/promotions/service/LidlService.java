@@ -58,8 +58,12 @@ public class LidlService extends BaseService{
         lidlArea.waitForElementPresent(browserManager.getDriver(), lidlArea.getCatalogs().get(0));
         lidlArea.getCatalogs().get(0).click();
         try {
-            getAllImagesForCurrentCatalog(browserManager.getDriver().getCurrentUrl());
-        }catch (Exception e){}
+            //lidlArea.waitForElementPresent(browserManager.getDriver(), lidlArea.getCatalogImagesNextButton());
+            //getAllImagesForCurrentCatalog(browserManager.getDriver().getCurrentUrl());
+            getAllImagesForCurrentCatalog("http://catalog.lidl.ro/21352641-75fb-4767-bcd1-6e014d6837ca/html5.html#/1");
+        }catch (Exception e){
+            System.out.println(e.getStackTrace());
+        }
         finally {
             browserManager.getProxy().stop();
             browserManager.closeBrowser();
@@ -68,6 +72,7 @@ public class LidlService extends BaseService{
     }
 
     public void getAllImagesForCurrentCatalog(String catalogUrl) throws Exception {
+        System.out.println("Catalog URL is: " +catalogUrl);
         String[] formatURL = catalogUrl.split("/html5");
         String catalogImagesUrl = formatURL[0].concat("/mobile.xml");
 

@@ -38,6 +38,11 @@ public class ShopDetails {
 
     @JsonIgnore
     @ManyToOne
+    @JoinColumn(name = "country_id")
+    private Country country;
+
+    @JsonIgnore
+    @ManyToOne
     @JoinColumn(name = "shop_id")
     @JsonBackReference
     private Shop shop;
@@ -108,6 +113,14 @@ public class ShopDetails {
 
     public void setClosingHour(Time closingHour) {
         this.closingHour = closingHour;
+    }
+
+    public Country getCountry() {
+        return country;
+    }
+
+    public void setCountry(Country country) {
+        this.country = country;
     }
 
     public Shop getShop() {

@@ -15,19 +15,6 @@ CREATE TABLE `promotions`.`shops` (
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC));
 
-DROP TABLE IF EXISTS `promotions`.`shops_countries`;
-CREATE TABLE `promotions`.`shops_countries` (
-  `shop_id` INT NOT NULL AUTO_INCREMENT,
-  `country_id` INT NOT NULL,
-  PRIMARY KEY (`shop_id`, `country_id`),
-  CONSTRAINT `fk_shops`
-    FOREIGN KEY (`shop_id`) REFERENCES `promotions`.`shops` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_countries`
-    FOREIGN KEY (`country_id`)
-    REFERENCES `promotions`.`countries` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE);
-
 
 DROP TABLE IF EXISTS  `promotions`.`catalog`;
 CREATE TABLE `promotions`.`catalog` (
@@ -97,6 +84,7 @@ CREATE TABLE `promotions`.`shop_details` (
   `zipcode` VARCHAR(45) NOT NULL,
   `opening_hour` TIME(0) NULL,
   `closing_hour` TIME(0) NULL,
+  `country_id` INT NOT NULL,
   `shop_id` INT NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
@@ -106,10 +94,20 @@ CREATE TABLE `promotions`.`shop_details` (
     ON DELETE CASCADE
     ON UPDATE CASCADE);
 
+ALTER TABLE `promotions`.`shop_details`
+ADD INDEX `fk_shops_countries_idx` (`country_id` ASC);
+ALTER TABLE `promotions`.`shop_details`
+ADD CONSTRAINT `fk_shops_countries`
+  FOREIGN KEY (`country_id`)
+  REFERENCES `promotions`.`countries` (`id`)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE;
 
 
 INSERT INTO countries (id, name, country_code) VALUES
-(1, "Romania", "RO");
+(1, "Romania", "RO"),
+(2, "Bulgaria", "BG"),
+(3, "Hungary", "HU");
 
 INSERT INTO `promotions`.`category` (id, name)  VALUES
 (1, "Haine si incaltaminte"),
@@ -129,24 +127,15 @@ INSERT INTO `promotions`.`shops` (id, name, identification_nb) VALUES
 (6, 'Takko', 'DE 209094382'),
 (7, 'H&M', ' RO 27092928');
 
-INSERT INTO `promotions`.`shops_countries` (shop_id, country_id) VALUES
-(1, 1),
-(2, 1),
-(3, 1),
-(4, 1),
-(5, 1),
-(6, 1),
-(7, 1);
-
-INSERT INTO `promotions`.`shop_details` (id, street, street_number, state, city, zipcode, opening_hour, closing_hour, shop_id) VALUES
-(1, 'Str. Apalinei', '1', 'Mures', 'Reghin', '545300', '7:30', '21:00', 1),
-(2, 'Str. Garii', '23-25', 'Mures', 'Reghin', '545300', '08:00', '21:00', 2),
-(3, 'Str. Libertatii', '16', 'Mures', 'Reghin', '545300', '7:30', '21:00', 3),
-(4, 'Str. MIhai Viteazul', '27', 'Mures', 'Reghin', '545300', '7:30', '21:00', 4),
-(5, 'Str. Garii', '17', 'Mures', 'Reghin', '545300', '7:30', '21:00', 5),
-(6, 'Str. Garii', '17', 'Mures', 'Reghin', '545300', '7:30', '21:00', 6),
-(7, 'Str. Alexandru Vaida Voevod', '53B', 'Cluj', 'Cluj Napoca', '400000', '10:00', '22:00', 7),
-(8, 'Str. Avram Iancu', '492-500', 'Cluj', 'Floresti', '407280', '10:00', '22:00', 7);
+INSERT INTO `promotions`.`shop_details` (id, street, street_number, state, city, zipcode, opening_hour, closing_hour, country_id, shop_id) VALUES
+(1, 'Str. Apalinei', '1', 'Mures', 'Reghin', '545300', '7:30', '21:00', 1, 1),
+(2, 'Str. Garii', '23-25', 'Mures', 'Reghin', '545300', '08:00', '21:00', 1, 2),
+(3, 'Str. Libertatii', '16', 'Mures', 'Reghin', '545300', '7:30', '21:00', 1, 3),
+(4, 'Str. MIhai Viteazul', '27', 'Mures', 'Reghin', '545300', '7:30', '21:00', 1, 4),
+(5, 'Str. Garii', '17', 'Mures', 'Reghin', '545300', '7:30', '21:00', 1, 5),
+(6, 'Str. Garii', '17', 'Mures', 'Reghin', '545300', '7:30', '21:00', 1, 6),
+(7, 'Str. Alexandru Vaida Voevod', '53B', 'Cluj', 'Cluj Napoca', '400000', '10:00', '22:00', 1, 7),
+(8, 'Str. Avram Iancu', '492-500', 'Cluj', 'Floresti', '407280', '10:00', '22:00', 1, 7);
 
 INSERT INTO `promotions`.`catalog` (id, name, start_date, end_date, shop_id)
 VALUES (1, 'Delicii ca-n MExic', '26.03.2017', '02.07.2017', 1);

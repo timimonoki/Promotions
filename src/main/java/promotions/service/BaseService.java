@@ -63,7 +63,7 @@ public abstract class BaseService {
     protected LidlArea lidlArea;
     protected KauflandArea kauflandArea;
 
-    public void setUp(SiteConfigurations configurations) throws MalformedURLException {
+    public void setUp(SiteConfigurations configurations) throws Exception {
         browserManager = new BrowserManager(configurations);
         lidlArea = new LidlArea(browserManager);
         kauflandArea = new KauflandArea(browserManager);
@@ -107,12 +107,12 @@ public abstract class BaseService {
             }
         }
         QShop qShop = QShop.shop;
-        com.querydsl.core.types.Predicate predicate = qShop.countries.any().name.eq(country)
+        com.querydsl.core.types.Predicate predicate = qShop.shopDetails.any().country.name.eq(country)
                                         .and(qShop.shopDetails.any().city.eq(city))
                                         .or(qShop.name.containsIgnoreCase(searchKey))
-                                        .or(qShop.countries.any().name.containsIgnoreCase(searchKey))
+                                        .or(qShop.shopDetails.any().country.name.containsIgnoreCase(searchKey))
                                         .or(qShop.shopDetails.any().city.containsIgnoreCase(searchKey))
-                                        .or(qShop.countries.any().countryCode.containsIgnoreCase(searchKey))
+                                        .or(qShop.shopDetails.any().country.countryCode.containsIgnoreCase(searchKey))
                                         .or(qShop.shopDetails.any().street.containsIgnoreCase(searchKey));
 
         List<Shop> shops = shopRepository.findAll(predicate, new PageRequest(page, pageSize, new Sort(direction, orderBy))).getContent();
@@ -121,8 +121,6 @@ public abstract class BaseService {
 
     public List<Catalog> findCatalogs(String country, String city, String shop, Integer id, Date startDate, Date endDate, String searchKey, String orderBy, Sort.Direction direction, Integer page, Integer pageSize) throws ValidatorException, EntityNotFoundException {
         validator.validate(country, city, shop, searchKey);
-        List<Predicate<Catalog>> predicateList = new ArrayList<>();
-        List<Predicate<Catalog>> searchKeyPredicateList = new ArrayList<>();
         if(!"".equals(country)){
             if(countryRepository.findByName(country).isEmpty()){
                 throw new EntityNotFoundException("This country does not exist in our database. Please enter something else");
@@ -142,14 +140,17 @@ public abstract class BaseService {
             if (catalogRepository.findOne(id) == null) {
                 throw new EntityNotFoundException("The catalog with the specified id does not exist in our database");
             }
+        }else{
+            id = -1;
         }
 
         QCatalog qCatalog = QCatalog.catalog;
-        com.querydsl.core.types.Predicate predicate = qCatalog.shop.countries.any().name.eq(country)
+        com.querydsl.core.types.Predicate predicate = qCatalog.shop.shopDetails.any().country.name.eq(country)
+                                            .and(qCatalog.shop.shopDetails.any().city.eq(city))
                                             .and(qCatalog.shop.name.eq(shop))
-                                            .and(qCatalog.id.eq(id))
-                                            .and(qCatalog.start_date.after(startDate))
-                                            .and(qCatalog.end_date.before(endDate))
+                                            .or(qCatalog.id.eq(id))
+                                            //.or(qCatalog.start_date.after(startDate))
+                                            //.or(qCatalog.end_date.before(endDate))
                                             .or(qCatalog.name.containsIgnoreCase(searchKey))
                                             .or(qCatalog.shop.name.containsIgnoreCase(searchKey));
 
@@ -163,7 +164,7 @@ public abstract class BaseService {
     public List<Catalog> findCurrentCatalogsForACity(String city) throws ValidatorException, EntityNotFoundException {
         validator.validate(city);
         if(!"".equals(city)){
-            if(shopDetailsRepository.findByCityName(city) == null){
+            if(shopDetailsRepository.findByCityName(city).isEmpty()){
                 throw new EntityNotFoundException("This city does not exist in our database. Please insert something else");
             }
             return catalogRepository.findCurrentCatalogsForACity(city);
@@ -202,7 +203,7 @@ public abstract class BaseService {
             if(countryRepository.findByName(country).isEmpty()){
                 throw new EntityNotFoundException("The coutry you entered does not exist in out database. Please enter something else");
             }
-            predicateList.add(sd -> sd.getShop().getCountries().stream().anyMatch(c -> c.getName().equals(country)));
+            predicateList.add(sd -> sd.getCountry().getName().equals(country));
         }
         if(!"".equals(city)){
             if(shopDetailsRepository.findByCityName(city).isEmpty()){

@@ -15,12 +15,19 @@ public class LidlArea extends BasePageObject{
     @FindBy(css = "#content > section > p > a > img")
     List<WebElement> catalogs;
 
+    @FindBy(css = "#menuNextPage")
+    private WebElement catalogImagesNextButton;
+
     public LidlArea(BrowserManager browserManager) throws MalformedURLException {
         super(browserManager);
     }
 
     public List<WebElement> getCatalogs() {
         return catalogs;
+    }
+
+    public WebElement getCatalogImagesNextButton() {
+        return catalogImagesNextButton;
     }
 }
 

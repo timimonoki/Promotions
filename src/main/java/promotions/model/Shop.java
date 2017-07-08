@@ -24,13 +24,6 @@ public class Shop {
     @Column(name = "identification_nb", nullable = false)
     private String idNumber;
 
-    @ManyToMany
-    @JoinTable(name = "shops_countries",
-            joinColumns = {@JoinColumn(name = "shop_id")},
-            inverseJoinColumns = {@JoinColumn(name = "country_id")})
-    @JsonBackReference
-    private List<Country> countries;
-
     @JsonIgnore
     @OneToMany(mappedBy = "shop")
     @JsonManagedReference
@@ -72,14 +65,6 @@ public class Shop {
 
     public void setIdNumber(String idNumber) {
         this.idNumber = idNumber;
-    }
-
-    public List<Country> getCountries() {
-        return countries;
-    }
-
-    public void setCountries(List<Country> countries) {
-        this.countries = countries;
     }
 
     public List<ShopDetails> getShopDetails() {

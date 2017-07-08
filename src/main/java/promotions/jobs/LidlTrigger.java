@@ -14,6 +14,8 @@ import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.TimeUnit;
+
 @Configuration
 public class LidlTrigger {
 
@@ -33,7 +35,7 @@ public class LidlTrigger {
     public SimpleTriggerFactoryBean trigger(JobDetail job) {
         SimpleTriggerFactoryBean trigger = new SimpleTriggerFactoryBean();
         trigger.setJobDetail(job);
-        trigger.setRepeatInterval(5000);
+        trigger.setRepeatInterval(TimeUnit.DAYS.toMillis(1));
         trigger.setRepeatCount(SimpleTrigger.REPEAT_INDEFINITELY);
         return trigger;
     }
