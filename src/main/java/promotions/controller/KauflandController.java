@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import promotions.pageArea.KauflandArea;
 import promotions.pageArea.LidlArea;
+import promotions.service.KauflandService;
 import promotions.tools.web.BrowserManager;
 import promotions.utils.conf.SiteConfigurations;
 
@@ -35,6 +36,9 @@ public class KauflandController extends BaseController{
     @Autowired
     SiteConfigurations configurations;
 
+    @Autowired
+    KauflandService kauflandService;
+
     public void initPages(WebDriver driver, WebDriverWait wait) throws MalformedURLException {
         kauflandArea = new KauflandArea(browserManager);
 
@@ -44,14 +48,6 @@ public class KauflandController extends BaseController{
 
     @RequestMapping(value = "/promotions", method = RequestMethod.GET)
     public void getCurrentCatalogImages() throws Exception {
-        browserManager = new BrowserManager(configurations);
-        initPages(browserManager.getDriver(), browserManager.getWait());
-
-        browserManager.getProxy().newHar("kaufland.ro");
-        browserManager.openUrl("https://www.kaufland.ro/oferte/cataloage-cu-reduceri.html");
-        Har har = browserManager.getProxy().getHar();
-        ObjectMapper mapper = new ObjectMapper();
-        String harString = mapper.writeValueAsString(har);
-        System.out.println("Har file content is: \n" +harString);
+        kauflandService.obtainCurrentCatalogImages();
     }
 }
