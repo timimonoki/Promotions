@@ -23,6 +23,4 @@
         <property name="kauflandUrl" value="${url.catalog.kaufland}"/>
     </bean>
 
-
-
 </beans>

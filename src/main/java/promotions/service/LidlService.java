@@ -2,6 +2,7 @@ package promotions.service;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 
 import static promotions.utils.Constants.*;
 
+@Primary
 @Service
 public class LidlService extends BaseService{
 
@@ -136,24 +138,6 @@ public class LidlService extends BaseService{
             }
         }
         return imageUrls;
-    }
-
-    public List<Catalog> findAllCatalogsForLidl(){
-        return catalogRepository.findAllCatalogsForAShop(LIDL);
-    }
-
-    public List<Catalog> findCurrentCatalogsForLidl(String city) throws ValidatorException, EntityNotFoundException {
-        validator.validate(city);
-        if(!"".equals(city)){
-            if(shopDetailsRepository.findByCityName(city) == null){
-                throw new EntityNotFoundException("This city does not exist in our database. Please insert something else");
-            }
-            return catalogRepository.findCurrentCatalogsForAShop(LIDL).stream()
-                    .filter(catalog -> catalog.getShop().getShopDetails().stream().anyMatch(sd -> sd.getCity().equals(city)))
-                    .collect(Collectors.toList());
-        }else{
-            return catalogRepository.findCurrentCatalogsForAShop(LIDL);
-        }
     }
 
     public List<Image> findImagesForACatalog(Integer id) throws EntityNotFoundException {

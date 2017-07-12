@@ -36,12 +36,10 @@ public class ShopDetails {
     @Column(name = "closing_hour")
     private Time closingHour;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "country_id")
     private Country country;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "shop_id")
     @JsonBackReference
@@ -50,7 +48,6 @@ public class ShopDetails {
 
     public ShopDetails(){}
 
-    @JsonIgnore
     public Integer getId() {
         return id;
     }

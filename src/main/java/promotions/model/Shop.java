@@ -24,7 +24,6 @@ public class Shop {
     @Column(name = "identification_nb", nullable = false)
     private String idNumber;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "shop")
     @JsonManagedReference
     private List<ShopDetails> shopDetails;

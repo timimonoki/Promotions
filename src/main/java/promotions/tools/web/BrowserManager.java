@@ -119,14 +119,12 @@ public class BrowserManager {
             }
         }
     }
-
     //close the browser
     public void closeBrowser() {
         if (driver != null) {
             driver.close();
         }
     }
-
     //close the server
     public void close() {
         driver.quit();

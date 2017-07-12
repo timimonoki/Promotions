@@ -2,9 +2,11 @@ package promotions.controller;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,8 +17,8 @@ import promotions.model.Image;
 import promotions.model.Shop;
 import promotions.model.ShopDetails;
 import promotions.service.BaseService;
-import java.util.Date;
-import java.util.List;
+
+import java.util.*;
 
 import static promotions.utils.Constants.*;
 
@@ -47,9 +49,19 @@ public class BaseController {
         return baseService.findCatalogById(id);
     }
 
-    @RequestMapping(value = "/currentCatalogs", method = RequestMethod.GET)
+    @RequestMapping(value = "/cityCatalogs", method = RequestMethod.GET)
     public List<Catalog> findCurrentCatalogsForACity(@RequestParam(required = false, defaultValue = "") String city) throws ValidatorException, EntityNotFoundException {
         return baseService.findCurrentCatalogsForACity(city);
+    }
+
+    @RequestMapping(value = "/allCatalogs", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<Catalog> findAllCatalogsForAShop(@RequestParam String shop){
+        return baseService.findAllCatalogsForAShop(shop);
+    }
+
+    @RequestMapping(value = "/currentCatalog", method = RequestMethod.GET)
+    public List<Catalog> findCurrentCatalogsForLidl(@RequestParam String city) throws ValidatorException, EntityNotFoundException {
+        return baseService.findCurrentCatalogsForAShop(city);
     }
 
     @RequestMapping(value = "/catalogImages", method = RequestMethod.GET)
@@ -73,6 +85,11 @@ public class BaseController {
         return baseService.getAllShopDetailsForAShop(shop);
     }
 
+    @RequestMapping(value = "/allShopsDetails", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<ShopDetails> getAllShopsDetailsForAShop() throws Exception {
+        return baseService.getAllShopsDetails();
+    }
+
     @RequestMapping(value = "/details", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ShopDetails> getShopDetailsForAShop(@RequestParam String shop,
                                                     @RequestParam(required = false, defaultValue = "") String country,
@@ -88,5 +105,14 @@ public class BaseController {
     @RequestMapping(value = "/detail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ShopDetails getShopDetailById(@RequestParam Integer id) throws EntityNotFoundException {
         return baseService.getShopDetailById(id);
+    }
+
+    @CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.OPTIONS})
+    @RequestMapping(value = "/location", method = RequestMethod.GET)
+    public Map<String, String> getLocation(){
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("latitude", "46.784010");
+        map.put("longitude", "23.556620");
+        return map;
     }
 }

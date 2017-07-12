@@ -10,6 +10,7 @@ import org.springframework.context.annotation.ImportResource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import promotions.data.ShopsWithLocations;
 import promotions.exceptions.EntityNotFoundException;
 import promotions.exceptions.ValidatorException;
 import promotions.model.*;
@@ -28,8 +29,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static promotions.utils.Constants.LIDL;
-import static promotions.utils.Utils.getDateFromString;
-import static promotions.utils.Utils.getStringFromDate;
+import static promotions.utils.Utils.*;
 
 @Component
 @ImportResource(locations = {"classpath:beans.xml"})
@@ -116,6 +116,11 @@ public abstract class BaseService {
                                         .or(qShop.shopDetails.any().street.containsIgnoreCase(searchKey));
 
         List<Shop> shops = shopRepository.findAll(predicate, new PageRequest(page, pageSize, new Sort(direction, orderBy))).getContent();
+//        List<ShopsWithLocations> shopsWithLocations = new ArrayList<>();
+//        ShopsWithLocations shopWithLocation;
+//        for (Shop shop : shops) {
+//            shopsWithLocations.add(convertToShopWithLocations(shop));
+//        }
         return shops;
     }
 
@@ -173,6 +178,20 @@ public abstract class BaseService {
         }
     }
 
+    public  List<Catalog> findAllCatalogsForAShop(String shop){
+        return catalogRepository.findAllCatalogsForAShop(shop);
+    }
+
+    public List<Catalog> findCurrentCatalogsForAShop(String shop) throws ValidatorException, EntityNotFoundException {
+        validator.validate(shop);
+        if (shopDetailsRepository.findByCityName(shop) == null) {
+            throw new EntityNotFoundException("This city does not exist in our database. Please insert something else");
+        }
+        return catalogRepository.findCurrentCatalogsForAShop(shop);
+    }
+
+
+
     public List<Image> findImagesForACatalog(Integer id) throws EntityNotFoundException {
         Catalog catalog = catalogRepository.findOne(id);
         if(catalog == null){
@@ -189,6 +208,10 @@ public abstract class BaseService {
             throw new EntityNotFoundException("This shop does not exist in our database. Please enter something else");
         }
         return shop.getShopDetails();
+    }
+
+    public List<ShopDetails> getAllShopsDetails(){
+        return shopDetailsRepository.findAll();
     }
 
     public List<ShopDetails> getShopDetailsForAShop(String shopName, String country, String city, Sort.Direction direction, String orderBy, Integer page, Integer pageSize) throws ValidatorException, EntityNotFoundException {

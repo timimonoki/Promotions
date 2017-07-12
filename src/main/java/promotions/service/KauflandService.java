@@ -2,10 +2,11 @@ package promotions.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.lightbody.bmp.core.har.Har;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import promotions.tools.web.BrowserManager;
 
-@Service
+@Component
 public class KauflandService extends BaseService{
 
     public void obtainCurrentCatalogImages() throws Exception {

@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import promotions.pageArea.KauflandArea;
-import promotions.pageArea.LidlArea;
 import promotions.service.KauflandService;
 import promotions.tools.web.BrowserManager;
 import promotions.utils.conf.SiteConfigurations;
