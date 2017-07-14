@@ -12,10 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import promotions.exceptions.EntityNotFoundException;
 import promotions.exceptions.ValidatorException;
-import promotions.model.Catalog;
-import promotions.model.Image;
-import promotions.model.Shop;
-import promotions.model.ShopDetails;
+import promotions.model.*;
 import promotions.service.BaseService;
 
 import java.util.*;
@@ -59,9 +56,9 @@ public class BaseController {
         return baseService.findAllCatalogsForAShop(shop);
     }
 
-    @RequestMapping(value = "/currentCatalog", method = RequestMethod.GET)
-    public List<Catalog> findCurrentCatalogsForLidl(@RequestParam String city) throws ValidatorException, EntityNotFoundException {
-        return baseService.findCurrentCatalogsForAShop(city);
+    @RequestMapping(value = "/currentCatalogs", method = RequestMethod.GET)
+    public List<Catalog> findCurrentCatalogsForAShop(@RequestParam Integer id) throws ValidatorException, EntityNotFoundException {
+        return baseService.findCurrentCatalogsForAShop(id);
     }
 
     @RequestMapping(value = "/catalogImages", method = RequestMethod.GET)
@@ -114,5 +111,10 @@ public class BaseController {
         map.put("latitude", "46.784010");
         map.put("longitude", "23.556620");
         return map;
+    }
+
+    @RequestMapping(value = "/categories", method = RequestMethod.GET)
+    public List<Category> findAllCategories(){
+        return baseService.findAllCategories();
     }
 }
